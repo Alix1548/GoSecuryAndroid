@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "825472506486",
+    "firebase_url": "https://gosecuriepsi.firebaseio.com",
+    "project_id": "gosecuriepsi",
+    "storage_bucket": "gosecuriepsi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:825472506486:android:b0cc7bca449e8a0cef5d57",
+        "android_client_info": {
+          "package_name": "com.collet.gosecury"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "825472506486-nqu9qmaorbk21ckjorvlspentoh9r1f8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.collet.gosecury",
+            "certificate_hash": "bbb2786e67fd2e5721589ea82df259377c29db8f"
+          }
+        },
+        {
+          "client_id": "825472506486-q7shjqcisu1gtr6kf9a1o4sl738h4u2k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiDia2ODZ_Y9hodtyW9NIL1PHvy7A83BE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "825472506486-q7shjqcisu1gtr6kf9a1o4sl738h4u2k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
