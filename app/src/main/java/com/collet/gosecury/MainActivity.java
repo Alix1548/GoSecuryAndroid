@@ -122,11 +122,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void displayImage(View view){
-        Intent intent = new Intent(this,DisplayImage.class);
-        intent.putExtra("image_path", currentImagePath);
-        startActivity(intent);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
