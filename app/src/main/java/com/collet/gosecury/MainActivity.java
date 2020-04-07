@@ -231,11 +231,35 @@ public class MainActivity extends AppCompatActivity {
         if (blockList.size() == 0) {
             Toast.makeText(this, "No text found", Toast.LENGTH_SHORT).show();
         } else {
+            int i=0;
             for (FirebaseVisionText.TextBlock block : blockList) {
-                text += " " + block.getText();
+                List<FirebaseVisionText.Line> LineList = block.getLines();
+                for (FirebaseVisionText.Line line : LineList) {
+                    if (i >= 2 && i <= 5) {
+                        String lastnameResearch = "Nom:";
+                        String lastName = researchWord(lastnameResearch, line);
+                        String nameResearch = "Prénom";
+                        String name = researchWord(nameResearch,line);
+                        text += " " + lastName + " " + name;
+                    }
+                    i += 1;
+                }
             }
-            String toto = "test";
             textView.setText(text);
         }
+    }
+
+    private String researchWord(String Word, FirebaseVisionText.Line line){
+        String result="";
+        if (line.getText().contains(Word)){
+            String[] tabTextBloc = line.getText().split(" ");
+            for (int j = 0 ; j < tabTextBloc.length ; j++){
+                if (tabTextBloc[j].contains(Word)){
+                    result = tabTextBloc[j+1];
+                }
+            }
+
+        }
+        return result;
     }
 }
