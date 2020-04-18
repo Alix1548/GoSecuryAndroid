@@ -25,6 +25,7 @@ import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -274,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
                 if (tabTextBloc[j].contains(Word)){
                     result = tabTextBloc[j+1];
                     result = result.replace(",","");
+                    result = removeAccents(result);
                 }
             }
         return result;
@@ -289,5 +291,10 @@ public class MainActivity extends AppCompatActivity {
         }
         return result;
     }
-
+    public static String removeAccents(String text)
+    {
+        return text == null ? null
+                : Normalizer.normalize(text, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+    }
 }
