@@ -27,7 +27,7 @@
         android:id="@+id/capture_image_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Capture image"
+        android:text="Prendre une photo"
         android:textAllCaps="false"
         android:layout_above="@+id/detect_text_image_btn"
         android:background="@color/colorAccent"
@@ -40,12 +40,26 @@
         android:id="@+id/detect_text_image_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="detect Text"
+
+        android:text="detecter les informations"
         android:textAllCaps="false"
         android:background="@color/colorPrimary"
         android:textColor="@android:color/white"
         android:textSize="17dp"
+        android:layout_above="@+id/check_identity"
+        android:layout_marginBottom="10dp"
         />
+
+    <Button
+        android:id="@+id/check_identity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:text="Vérifier l'identité en base de donnée"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="17dp"
+        android:visibility="invisible" />
 
 </RelativeLayout>

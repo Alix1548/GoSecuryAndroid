@@ -12,10 +12,18 @@ import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
@@ -44,11 +52,18 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button captureImageBtn, detectTextBtn;
+    private Button captureImageBtn, detectTextBtn, checkIdentity;
     private ImageView imageView;
     private TextView textView;
     private Bitmap imageBitmap;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    private List<Users> usersList;
+    private String lastnameResearch = "Nom";
+    private String nameResearch = "Prénom";
+    private String numberResearch = "";
+    private String lastName="";
+    private String name="";
+    private String number="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         captureImageBtn = findViewById(R.id.capture_image_btn);
         detectTextBtn = findViewById(R.id.detect_text_image_btn);
+        checkIdentity = findViewById(R.id.check_identity);
         imageView = findViewById(R.id.image_view);
         textView = findViewById(R.id.text_display);
 
@@ -76,13 +92,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*FirebaseFirestore db = FirebaseFirestore.getInstance();
+        checkIdentity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkIdentity();
+            }
+        });
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         final String TAG = "MainActivity";
 
-        Map<String, Object> user = new HashMap<>();
+        /*Map<String, Object> user = new HashMap<>();
         user.put("first", "Alix");
         user.put("last", "Collet");
-        user.put("born", 1815);
+        user.put("number", "141144201318");
 
         db.collection("Users")
                 .add(user)
@@ -224,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Error: ", e.getMessage());
             }
         });
+        checkIdentity.setVisibility(View.VISIBLE);
     }
 
     private void displayTextFormImage(FirebaseVisionText firebaseVisionText) {
@@ -234,12 +258,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             int i=0;
             int j=0;
-            String lastnameResearch = "Nom";
-            String nameResearch = "Prénom";
-            String numberResearch = "";
-            String lastName="";
-            String name="";
-            String number="";
+
             for (FirebaseVisionText.TextBlock block : blockList) {
                 List<FirebaseVisionText.Line> LineList = block.getLines();
                 for (FirebaseVisionText.Line line : LineList) {
@@ -287,7 +306,9 @@ public class MainActivity extends AppCompatActivity {
             String[] tabTextBloc = line.getText().split("");
             for (int j = 0; j < 13; j++) {
                 result += tabTextBloc[j];
+
             }
+            result = result.replace(" ","");
         }
         return result;
     }
@@ -297,4 +318,34 @@ public class MainActivity extends AppCompatActivity {
                 : Normalizer.normalize(text, Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
+
+    private void checkIdentity() {
+        textView.setText("");
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference notebookRef = db.collection("Users");
+
+        notebookRef.whereEqualTo("number", number)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        String data = "";
+
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Users user = documentSnapshot.toObject(Users.class);
+
+                            String first = user.getFirst();
+                            String last = user.getLast();
+                            String number = user.getNumber();
+
+                            data +=
+                                    "\nPrénom " + first + "\nNom " + last + "\nNuméro D'identité " + number + "\n\n";
+                        }
+
+                        textView.setText(data);
+                    }
+                });
+    }
+
+
 }
