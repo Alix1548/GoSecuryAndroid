@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        /*FirebaseFirestore db = FirebaseFirestore.getInstance();
         final String TAG = "MainActivity";
 
         Map<String, Object> user = new HashMap<>();
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onFailure(@NonNull Exception e) {
                         Log.w(TAG, "Error adding document", e);
                     }
-                });
+                });*/
     }
 
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -232,16 +232,34 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "No text found", Toast.LENGTH_SHORT).show();
         } else {
             int i=0;
+            int j=0;
+            String lastnameResearch = "Nom";
+            String nameResearch = "Prénom";
+            String numberResearch = "";
+            String lastName="";
+            String name="";
+            String number="";
             for (FirebaseVisionText.TextBlock block : blockList) {
                 List<FirebaseVisionText.Line> LineList = block.getLines();
                 for (FirebaseVisionText.Line line : LineList) {
-                    if (i >= 2 && i <= 5) {
-                        String lastnameResearch = "Nom:";
-                        String lastName = researchWord(lastnameResearch, line);
-                        String nameResearch = "Prénom";
-                        String name = researchWord(nameResearch,line);
-                        text += " " + lastName + " " + name;
+                    if (i >= 2 && i <= 7) {
+                        if (line.getText().contains(lastnameResearch)) {
+                            lastName = researchWord(lastnameResearch, line);
+
+                        }
+                        if (line.getText().contains(name)) {
+                            name = researchWord(nameResearch, line);
+                            j=1;
+                        }
+
                     }
+                    if (i>12 && j==1){
+                        numberResearch =name + "<<";
+                        if (line.getText().contains(numberResearch)) {
+                            number = researchNumber(line,numberResearch);
+                        }
+                    }
+                    text = "identité : " + lastName + " " + name + " numéro : "+ number;
                     i += 1;
                 }
             }
@@ -251,15 +269,25 @@ public class MainActivity extends AppCompatActivity {
 
     private String researchWord(String Word, FirebaseVisionText.Line line){
         String result="";
-        if (line.getText().contains(Word)){
             String[] tabTextBloc = line.getText().split(" ");
             for (int j = 0 ; j < tabTextBloc.length ; j++){
                 if (tabTextBloc[j].contains(Word)){
                     result = tabTextBloc[j+1];
+                    result = result.replace(",","");
                 }
             }
-
+        return result;
+    }
+    private String researchNumber(FirebaseVisionText.Line line, String name){
+        String result="";
+        int m = 0;
+        if (line.getText().contains(name)) {
+            String[] tabTextBloc = line.getText().split("");
+            for (int j = 0; j < 13; j++) {
+                result += tabTextBloc[j];
+            }
         }
         return result;
     }
+
 }
