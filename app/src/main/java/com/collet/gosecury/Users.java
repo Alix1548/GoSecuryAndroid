@@ -1,19 +1,18 @@
 package com.collet.gosecury;
-
-import com.google.firebase.firestore.Exclude;
-
 public class Users {
     String first;
     String last;
     String number;
 
+    public Users(){
+
+    }
     public Users( String first, String last, String number) {
         this.first = first;
         this.last = last;
         this.number = number;
     }
 
-    @Exclude
     public String getFirst() {
         return first;
     }
