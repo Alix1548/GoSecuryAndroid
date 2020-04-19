@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private String name="";
     private String number="";
     final String TAG = "MainActivity";
+    File photoFile = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
-            File photoFile = null;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
@@ -289,6 +289,7 @@ public class MainActivity extends AppCompatActivity {
                     i += 1;
                 }
             }
+            photoFile.delete();
             checkIdentity.setVisibility(View.VISIBLE);
             textView.setText(text);
         }
@@ -351,12 +352,6 @@ public class MainActivity extends AppCompatActivity {
 
                             id = documentSnapshot.getId();
                             dateList = user.getDateList();
-                            /*Date now = new Date();
-                            DateFormat shortDateFormat = DateFormat.getDateTimeInstance(
-                                    DateFormat.SHORT,
-                                    DateFormat.SHORT);
-
-                            currentDate = shortDateFormat.format(now);*/
                             currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
                             dateList.add(currentDate);
 
