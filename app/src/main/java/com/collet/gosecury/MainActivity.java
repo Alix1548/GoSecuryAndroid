@@ -33,11 +33,13 @@ import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private String lastName="";
     private String name="";
     private String number="";
+    final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 dispatchTakePictureIntent();
                 textView.setText("");
+                checkIdentity.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -100,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        final String TAG = "MainActivity";
+
 
         /*Map<String, Object> user = new HashMap<>();
         user.put("first", "Alix");
@@ -247,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Error: ", e.getMessage());
             }
         });
-        checkIdentity.setVisibility(View.VISIBLE);
+
     }
 
     private void displayTextFormImage(FirebaseVisionText firebaseVisionText) {
@@ -283,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
                     i += 1;
                 }
             }
+            checkIdentity.setVisibility(View.VISIBLE);
             textView.setText(text);
         }
     }
@@ -320,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkIdentity() {
-        textView.setText("");
+        textView.clearComposingText();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference notebookRef = db.collection("Users");
 
@@ -330,18 +335,35 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         String data = "";
+                        String first = "";
+                        String last = "";
+                        String number = "";
+                        String id = "";
+                        String currentDate="";
 
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             Users user = documentSnapshot.toObject(Users.class);
 
-                            String first = user.getFirst();
-                            String last = user.getLast();
-                            String number = user.getNumber();
+                            id = documentSnapshot.getId();
+                            first = user.getFirst();
+                            last = user.getLast();
+                            number = user.getNumber();
 
-                            data +=
-                                    "\nPrénom " + first + "\nNom " + last + "\nNuméro D'identité " + number + "\n\n";
+                            currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+
+
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            String document = "Users/" + id;
+                            DocumentReference noteRef = db.document("Users/" + id);
+                            String keyDate = "visiteDate"+ currentDate;
+                            noteRef.update(keyDate, currentDate);
+
+
                         }
 
+
+
+                        data = currentDate + "\nIdentité " + first + " " + last + "\nNuméro D'identité " + number + "\n\n";
                         textView.setText(data);
                     }
                 });

@@ -9,7 +9,8 @@
     <ImageView
         android:id="@+id/image_view"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="350dp"
+        android:fontFamily="@font/roboto_thin"
         />
 
     <TextView
@@ -20,34 +21,36 @@
         android:layout_below="@+id/image_view"
         android:textSize="26dp"
         android:maxLines="5"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
+        android:fontFamily="@font/roboto_thin"
         />
 
     <Button
         android:id="@+id/capture_image_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/detect_text_image_btn"
+        android:layout_marginBottom="10dp"
+        android:background="@color/Blue"
+        android:fontFamily="@font/roboto_thin"
         android:text="Prendre une photo"
         android:textAllCaps="false"
-        android:layout_above="@+id/detect_text_image_btn"
-        android:background="@color/colorAccent"
-        android:textColor="@android:color/white"
-        android:textSize="17dp"
-        android:layout_marginBottom="10dp"
-    />
+        android:textColor="@android:color/black"
+        android:textSize="17dp" />
 
     <Button
         android:id="@+id/detect_text_image_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:text="detecter les informations"
+        android:text="Détecter les informations"
         android:textAllCaps="false"
-        android:background="@color/colorPrimary"
-        android:textColor="@android:color/white"
+        android:background="@color/green"
+        android:textColor="@android:color/black"
         android:textSize="17dp"
         android:layout_above="@+id/check_identity"
         android:layout_marginBottom="10dp"
+        android:fontFamily="@font/roboto_thin"
         />
 
     <Button
@@ -55,11 +58,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/colorPrimary"
+        android:background="@color/Blue"
         android:text="Vérifier l'identité en base de donnée"
         android:textAllCaps="false"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="17dp"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:fontFamily="@font/roboto_thin"
+        />
 
 </RelativeLayout>
