@@ -33,9 +33,11 @@ import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -309,9 +311,14 @@ public class MainActivity extends AppCompatActivity {
         int m = 0;
         if (line.getText().contains(name)) {
             String[] tabTextBloc = line.getText().split("");
-            for (int j = 0; j < 13; j++) {
-                result += tabTextBloc[j];
-
+            if (tabTextBloc[0].isEmpty()){
+                for (int j = 1; j < 13; j++) {
+                    result += tabTextBloc[j];
+                }
+            }else {
+                for (int j = 0; j < 12; j++) {
+                    result += tabTextBloc[j];
+                }
             }
             result = result.replace(" ","");
         }
@@ -335,35 +342,33 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         String data = "";
-                        String first = "";
-                        String last = "";
-                        String number = "";
                         String id = "";
+                        ArrayList<String> dateList = new ArrayList<String>();
                         String currentDate="";
 
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             Users user = documentSnapshot.toObject(Users.class);
 
                             id = documentSnapshot.getId();
-                            first = user.getFirst();
-                            last = user.getLast();
-                            number = user.getNumber();
+                            dateList = user.getDateList();
+                            /*Date now = new Date();
+                            DateFormat shortDateFormat = DateFormat.getDateTimeInstance(
+                                    DateFormat.SHORT,
+                                    DateFormat.SHORT);
 
+                            currentDate = shortDateFormat.format(now);*/
                             currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-
+                            dateList.add(currentDate);
 
                             FirebaseFirestore db = FirebaseFirestore.getInstance();
-                            String document = "Users/" + id;
                             DocumentReference noteRef = db.document("Users/" + id);
-                            String keyDate = "visiteDate"+ currentDate;
-                            noteRef.update(keyDate, currentDate);
-
-
+                            String keyDate = "dateList";
+                            noteRef.update(keyDate, dateList);
                         }
 
 
 
-                        data = currentDate + "\nIdentité " + first + " " + last + "\nNuméro D'identité " + number + "\n\n";
+                        data = currentDate + "\n ACCES AUTORISE";
                         textView.setText(data);
                     }
                 });
