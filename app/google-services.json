@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "825472506486-dmirvm4f2subl9lb60f0simeullu0cjk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.collet.gosecury",
+            "certificate_hash": "3483f4ba7865e9908387beea33177770889bed18"
+          }
+        },
+        {
           "client_id": "825472506486-nqu9qmaorbk21ckjorvlspentoh9r1f8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -22,6 +30,72 @@
             "certificate_hash": "bbb2786e67fd2e5721589ea82df259377c29db8f"
           }
         },
+        {
+          "client_id": "825472506486-q7shjqcisu1gtr6kf9a1o4sl738h4u2k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiDia2ODZ_Y9hodtyW9NIL1PHvy7A83BE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "825472506486-q7shjqcisu1gtr6kf9a1o4sl738h4u2k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:825472506486:android:91366e81e77a7812ef5d57",
+        "android_client_info": {
+          "package_name": "com.example.gosecuri"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "825472506486-c9u22agbv8kceajrq1qjc1pinm30eni9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gosecuri",
+            "certificate_hash": "411dc010979702b16f297fc3e4cadaeee77710fd"
+          }
+        },
+        {
+          "client_id": "825472506486-q7shjqcisu1gtr6kf9a1o4sl738h4u2k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiDia2ODZ_Y9hodtyW9NIL1PHvy7A83BE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "825472506486-q7shjqcisu1gtr6kf9a1o4sl738h4u2k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:825472506486:android:a154a72f4bbcf6a8ef5d57",
+        "android_client_info": {
+          "package_name": "com.example.gosecury"
+        }
+      },
+      "oauth_client": [
         {
           "client_id": "825472506486-q7shjqcisu1gtr6kf9a1o4sl738h4u2k.apps.googleusercontent.com",
           "client_type": 3

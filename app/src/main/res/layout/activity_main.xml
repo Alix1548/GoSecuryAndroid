@@ -11,13 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:fontFamily="@font/roboto_thin"
+        android:src="@drawable/gosecuri"
         />
 
     <TextView
         android:id="@+id/text_display"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Display Detected text from image"
+        android:text=""
         android:layout_below="@+id/image_view"
         android:textSize="26dp"
         android:maxLines="5"
@@ -39,10 +40,23 @@
         android:textSize="17dp" />
 
     <Button
+        android:id="@+id/exit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/check_identity"
+        android:layout_marginBottom="10dp"
+        android:background="@color/green"
+        android:fontFamily="@font/roboto_thin"
+        android:text="Quitter"
+        android:textAllCaps="false"
+        android:textColor="@android:color/black"
+        android:textSize="17dp" />
+
+    <Button
         android:id="@+id/detect_text_image_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
+        android:visibility="invisible"
         android:text="Détecter les informations"
         android:textAllCaps="false"
         android:background="@color/green"
@@ -62,6 +76,21 @@
         android:text="Vérifier l'identité en base de donnée"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
+        android:textSize="17dp"
+        android:visibility="invisible"
+        android:fontFamily="@font/roboto_thin"
+        />
+
+    <Button
+        android:id="@+id/own_photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/Blue"
+        android:text="Prendre une photo de vous"
+        android:layout_above="@+id/detect_text_image_btn"
+        android:textAllCaps="false"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="10dp"
         android:textSize="17dp"
         android:visibility="invisible"
         android:fontFamily="@font/roboto_thin"

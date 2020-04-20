@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,6 +31,9 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,39 +54,53 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static android.os.Process.SIGNAL_KILL;
+
 public class MainActivity extends AppCompatActivity {
 
-    private Button captureImageBtn, detectTextBtn, checkIdentity;
+    private StorageReference mStorageRef;
+    private Button captureImageBtn, detectTextBtn, checkIdentity, ownPhoto, quit;
     private ImageView imageView;
     private TextView textView;
     private Bitmap imageBitmap;
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    private List<Users> usersList;
     private String lastnameResearch = "Nom";
     private String nameResearch = "Prénom";
     private String numberResearch = "";
     private String lastName="";
     private String name="";
     private String number="";
+    public Uri imguri;
     final String TAG = "MainActivity";
-    File photoFile = null;
+    File photoFile;
+    static final int REQUEST_TAKE_PHOTO = 1;
+    String mCurrentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         captureImageBtn = findViewById(R.id.capture_image_btn);
         detectTextBtn = findViewById(R.id.detect_text_image_btn);
         checkIdentity = findViewById(R.id.check_identity);
         imageView = findViewById(R.id.image_view);
         textView = findViewById(R.id.text_display);
+        ownPhoto = findViewById(R.id.own_photo);
+        quit = findViewById(R.id.exit);
+
+        quit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         captureImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,6 +108,15 @@ public class MainActivity extends AppCompatActivity {
                 dispatchTakePictureIntent();
                 textView.setText("");
                 checkIdentity.setVisibility(View.INVISIBLE);
+                detectTextBtn.setVisibility(View.VISIBLE);
+                quit.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        ownPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTakePictureIntent();
             }
         });
 
@@ -108,36 +136,42 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-
-        /*Map<String, Object> user = new HashMap<>();
-        user.put("first", "Alix");
-        user.put("last", "Collet");
-        user.put("number", "141144201318");
-
-        db.collection("Users")
-                .add(user)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });*/
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            switch (requestCode) {
+                case 1:{
+                    System.out.println("----------------------Case 1");
+                    if (resultCode == RESULT_OK) {
+                        File file = new File(mCurrentPhotoPath);
+                        imageBitmap = MediaStore.Images.Media
+                                .getBitmap(this.getContentResolver(), Uri.fromFile(file));
+                        if (imageBitmap != null) {
+                            imageView.setImageBitmap(imageBitmap);
+                            test();
+                        }
+                    }
+                    break;
+                }
+                case 0: {
+                    System.out.println("----------------------ERROR CASE 0 ");
+                    break;
+                }
+                default:{
+                    System.out.println("-----------------DEFAULT : " + requestCode);
+                }
+            }
 
-    static final int REQUEST_TAKE_PHOTO = 1;
+        } catch (Exception error) {
+            error.printStackTrace();
+        }
+    }
     private void dispatchTakePictureIntent() {
-
-       /* Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }*/
+        if (photoFile!=null){
+            photoFile.delete();
+        }
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -146,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
-
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
@@ -156,8 +189,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    String mCurrentPhotoPath;
-
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -168,75 +199,10 @@ public class MainActivity extends AppCompatActivity {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        try {
-            switch (requestCode) {
-                case 1:
-                case 0: {
-                    if (resultCode == RESULT_OK) {
-                        File file = new File(mCurrentPhotoPath);
-                        imageBitmap = MediaStore.Images.Media
-                                .getBitmap(this.getContentResolver(), Uri.fromFile(file));
-                        if (imageBitmap != null) {
-                            imageView.setImageBitmap(imageBitmap);
-                        }
-                    }
-                    break;
-                }
-            }
-
-        } catch (Exception error) {
-            error.printStackTrace();
-        }
-      /*  super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            imageBitmap = (Bitmap) extras.get("data");
-            imageView.setImageBitmap(imageBitmap);
-
-            String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-            File myDir = new File(root + "/saved_images");
-            myDir.mkdirs();
-            Random generator = new Random();
-            int n = 10000;
-            n = generator.nextInt(n);
-            String fname = "Image-" + n + ".jpg";
-            File file = new File(myDir, fname);
-            if (file.exists())
-                file.delete();
-            try {
-                FileOutputStream out = new FileOutputStream(file);
-                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-                out.flush();
-                out.close();
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
-            // Tell the media scanner about the new file so that it is
-            // immediately available to the user.
-            MediaScannerConnection.scanFile(this, new String[] { file.toString() }, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                        public void onScanCompleted(String path, Uri uri) {
-                            Log.i("ExternalStorage", "Scanned " + path + ":");
-                            Log.i("ExternalStorage", "-> uri=" + uri);
-                        }
-                    });
-
-        }*/
-    }
-
     private void detectTextFromImage() {
         FirebaseVisionImage firebaseVisionImage = FirebaseVisionImage.fromBitmap(imageBitmap);
         FirebaseVisionTextRecognizer firebaseVisionTextRecognizer = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
@@ -253,14 +219,16 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Error: ", e.getMessage());
             }
         });
-
     }
-
     private void displayTextFormImage(FirebaseVisionText firebaseVisionText) {
         String text = "";
+        lastName="";
+        name="";
+        number="";
         List<FirebaseVisionText.TextBlock> blockList = firebaseVisionText.getTextBlocks();
         if (blockList.size() == 0) {
             Toast.makeText(this, "No text found", Toast.LENGTH_SHORT).show();
+            photoFile.delete();
         } else {
             int i=0;
             int j=0;
@@ -271,13 +239,11 @@ public class MainActivity extends AppCompatActivity {
                     if (i >= 2 && i <= 7) {
                         if (line.getText().contains(lastnameResearch)) {
                             lastName = researchWord(lastnameResearch, line);
-
                         }
                         if (line.getText().contains(name)) {
                             name = researchWord(nameResearch, line);
                             j=1;
                         }
-
                     }
                     if (i>12 && j==1){
                         numberResearch =name + "<<";
@@ -294,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
             textView.setText(text);
         }
     }
-
     private String researchWord(String Word, FirebaseVisionText.Line line){
         String result="";
             String[] tabTextBloc = line.getText().split(" ");
@@ -325,13 +290,11 @@ public class MainActivity extends AppCompatActivity {
         }
         return result;
     }
-    public static String removeAccents(String text)
-    {
+    public static String removeAccents(String text){
         return text == null ? null
                 : Normalizer.normalize(text, Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
-
     private void checkIdentity() {
         textView.clearComposingText();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -361,13 +324,45 @@ public class MainActivity extends AppCompatActivity {
                             noteRef.update(keyDate, dateList);
                         }
 
-
-
-                        data = currentDate + "\n ACCES AUTORISE";
-                        textView.setText(data);
+                        if (queryDocumentSnapshots.isEmpty()) {
+                            data = "ACCES REFUSE";
+                            ownPhoto.setVisibility(View.VISIBLE);
+                            captureImageBtn.setVisibility(View.INVISIBLE);
+                            checkIdentity.setVisibility(View.INVISIBLE);
+                            detectTextBtn.setVisibility(View.INVISIBLE);
+                            textView.setText("Pas autorisé: Prendre une photo de vous.");
+                            quit.setVisibility(View.VISIBLE);
+                        }else{
+                            data = currentDate + "\n ACCES AUTORISE";
+                        }
                     }
                 });
     }
+    private void sendToStorage(){
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+        Uri file = Uri.fromFile(photoFile);
+        StorageReference riversRef = mStorageRef.child("Test.jpg");
 
+        riversRef.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        Task<Uri> downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        System.out.println("La vie c'est de la merde");
+                    }
+                });
+    }
+    private void test(){
+        Uri file = Uri.fromFile(photoFile);
+        StorageReference storr = FirebaseStorage.getInstance().getReference();
 
+        StorageReference mountainsRef = storr.child("Picts/"+file.getLastPathSegment());
+        UploadTask uploadTask = mountainsRef.putFile(file);
+    }
 }
