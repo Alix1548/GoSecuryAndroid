@@ -106,38 +106,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-
-        /*Map<String, Object> user = new HashMap<>();
-        user.put("first", "Alix");
-        user.put("last", "Collet");
-        user.put("number", "141144201318");
-
-        db.collection("Users")
-                .add(user)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });*/
     }
 
     static final int REQUEST_TAKE_PHOTO = 1;
     private void dispatchTakePictureIntent() {
-
-       /* Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }*/
+        if (photoFile!=null){
+            photoFile.delete();
+        }
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -192,49 +167,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
             }
-
         } catch (Exception error) {
             error.printStackTrace();
         }
-      /*  super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            imageBitmap = (Bitmap) extras.get("data");
-            imageView.setImageBitmap(imageBitmap);
-
-            String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-            File myDir = new File(root + "/saved_images");
-            myDir.mkdirs();
-            Random generator = new Random();
-            int n = 10000;
-            n = generator.nextInt(n);
-            String fname = "Image-" + n + ".jpg";
-            File file = new File(myDir, fname);
-            if (file.exists())
-                file.delete();
-            try {
-                FileOutputStream out = new FileOutputStream(file);
-                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-                out.flush();
-                out.close();
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
-            // Tell the media scanner about the new file so that it is
-            // immediately available to the user.
-            MediaScannerConnection.scanFile(this, new String[] { file.toString() }, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                        public void onScanCompleted(String path, Uri uri) {
-                            Log.i("ExternalStorage", "Scanned " + path + ":");
-                            Log.i("ExternalStorage", "-> uri=" + uri);
-                        }
-                    });
-
-        }*/
     }
 
     private void detectTextFromImage() {
@@ -258,9 +193,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayTextFormImage(FirebaseVisionText firebaseVisionText) {
         String text = "";
+        lastName="";
+        name="";
+        number="";
         List<FirebaseVisionText.TextBlock> blockList = firebaseVisionText.getTextBlocks();
         if (blockList.size() == 0) {
             Toast.makeText(this, "No text found", Toast.LENGTH_SHORT).show();
+            photoFile.delete();
         } else {
             int i=0;
             int j=0;
@@ -271,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
                     if (i >= 2 && i <= 7) {
                         if (line.getText().contains(lastnameResearch)) {
                             lastName = researchWord(lastnameResearch, line);
-
                         }
                         if (line.getText().contains(name)) {
                             name = researchWord(nameResearch, line);
@@ -360,13 +298,22 @@ public class MainActivity extends AppCompatActivity {
                             String keyDate = "dateList";
                             noteRef.update(keyDate, dateList);
                         }
+                        if (queryDocumentSnapshots.isEmpty()) {
+                            data = "ACCES REFUSE";
+                        }else{
+                            data = currentDate + "\n ACCES AUTORISE";
+                        }
 
-
-
-                        data = currentDate + "\n ACCES AUTORISE";
                         textView.setText(data);
                     }
-                });
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(MainActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                Log.d("Error: ", e.getMessage());
+            }
+        });
     }
 
 

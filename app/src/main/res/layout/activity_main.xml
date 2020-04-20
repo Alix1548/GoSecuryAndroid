@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:fontFamily="@font/roboto_thin"
+        android:textStyle="bold"
         />
 
     <TextView
@@ -23,6 +24,7 @@
         android:maxLines="5"
         android:layout_margin="5dp"
         android:fontFamily="@font/roboto_thin"
+        android:textStyle="bold"
         />
 
     <Button
@@ -36,7 +38,9 @@
         android:text="Prendre une photo"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
-        android:textSize="17dp" />
+        android:textSize="17dp"
+        android:textStyle="bold"
+        />
 
     <Button
         android:id="@+id/detect_text_image_btn"
@@ -51,6 +55,7 @@
         android:layout_above="@+id/check_identity"
         android:layout_marginBottom="10dp"
         android:fontFamily="@font/roboto_thin"
+        android:textStyle="bold"
         />
 
     <Button
@@ -65,6 +70,7 @@
         android:textSize="17dp"
         android:visibility="invisible"
         android:fontFamily="@font/roboto_thin"
+        android:textStyle="bold"
         />
 
 </RelativeLayout>
