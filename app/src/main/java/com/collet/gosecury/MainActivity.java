@@ -7,6 +7,7 @@ import androidx.core.content.FileProvider;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -325,10 +326,12 @@ public class MainActivity extends AppCompatActivity {
                             captureImageBtn.setVisibility(View.INVISIBLE);
                             checkIdentity.setVisibility(View.INVISIBLE);
                             detectTextBtn.setVisibility(View.INVISIBLE);
+                            textView.setTextColor(Color.RED);
                             textView.setText("Pas autorisé: Prendre une photo de vous.");
                             quit.setVisibility(View.VISIBLE);
                         }else{
-                            data = currentDate + "\n ACCES AUTORISE";
+                            textView.setTextColor(Color.GREEN);
+                            textView.setText("Accès autorisé.");
                         }
                     }
                 });
