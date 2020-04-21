@@ -13,16 +13,8 @@ import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -31,6 +23,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -53,12 +46,14 @@ import java.util.Random;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import static android.os.Process.SIGNAL_KILL;
 
@@ -73,14 +68,14 @@ public class MainActivity extends AppCompatActivity {
     private String lastnameResearch = "Nom";
     private String nameResearch = "Prénom";
     private String numberResearch = "";
-    private String lastName="";
-    private String name="";
-    private String number="";
-    public Uri imguri;
+    private String lastName;
+    private String name;
+    private String number;
     final String TAG = "MainActivity";
     File photoFile;
     static final int REQUEST_TAKE_PHOTO = 1;
     String mCurrentPhotoPath;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dispatchTakePictureIntent();
-                textView.setText("");
+                textView.setText("Détectez le texte de l'image.");
                 checkIdentity.setVisibility(View.INVISIBLE);
                 detectTextBtn.setVisibility(View.VISIBLE);
                 quit.setVisibility(View.INVISIBLE);
@@ -150,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                                 .getBitmap(this.getContentResolver(), Uri.fromFile(file));
                         if (imageBitmap != null) {
                             imageView.setImageBitmap(imageBitmap);
-                            test();
+                            sendToStorage();
                         }
                     }
                     break;
@@ -341,28 +336,14 @@ public class MainActivity extends AppCompatActivity {
     private void sendToStorage(){
         mStorageRef = FirebaseStorage.getInstance().getReference();
         Uri file = Uri.fromFile(photoFile);
-        StorageReference riversRef = mStorageRef.child("Test.jpg");
+        StorageReference riversRef = mStorageRef.child("Picts/Bonsoir/"+file.getLastPathSegment());
 
         riversRef.putFile(file)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Get a URL to the uploaded content
-                        Task<Uri> downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-                    }
-                })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        System.out.println("La vie c'est de la merde");
+                        Toast.makeText(MainActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                     }
                 });
-    }
-    private void test(){
-        Uri file = Uri.fromFile(photoFile);
-        StorageReference storr = FirebaseStorage.getInstance().getReference();
-
-        StorageReference mountainsRef = storr.child("Picts/"+file.getLastPathSegment());
-        UploadTask uploadTask = mountainsRef.putFile(file);
     }
 }
